@@ -1,31 +1,31 @@
-'17/02/2013 ITVolna
-'Скрипт записи в файл новых значений пары - имя пк и его MAC
-'Скрипт содержит две функции:macfunc - определения MAC и MACWrite - Записи MAC в файл
+п»ї'17/02/2013 Russ
+'РЎРєСЂРёРїС‚ Р·Р°РїРёСЃРё РІ С„Р°Р№Р» РЅРѕРІС‹С… Р·РЅР°С‡РµРЅРёР№ РїР°СЂС‹ - РёРјСЏ РїРє Рё РµРіРѕ MAC
+'РЎРєСЂРёРїС‚ СЃРѕРґРµСЂР¶РёС‚ РґРІРµ С„СѓРЅРєС†РёРё:macfunc - РѕРїСЂРµРґРµР»РµРЅРёСЏ MAC Рё MACWrite - Р—Р°РїРёСЃРё MAC РІ С„Р°Р№Р»
 '
 '
 set WshShell = CreateObject("WScript.Shell")
 Set objNetwork = CreateObject("WScript.Network")
-strComputer = objNetwork.ComputerName 'Имя ПК
+strComputer = objNetwork.ComputerName 'РРјСЏ РџРљ
 Set oFSO = CreateObject("Scripting.FileSystemObject")
 
 strArchPath = oFSO.GetParentFolderName(WScript.ScriptFullName) & "\"
 strArchName = strArchPath & "key.txt"
 If oFSO.FileExists(strArchName) Then
-MsgBox "Продолжим работу с существующим файлом"
+MsgBox "РџСЂРѕРґРѕР»Р¶РёРј СЂР°Р±РѕС‚Сѓ СЃ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРј С„Р°Р№Р»РѕРј"
 Else
-MsgBox "Будет создан новый файл"
+MsgBox "Р‘СѓРґРµС‚ СЃРѕР·РґР°РЅ РЅРѕРІС‹Р№ С„Р°Р№Р»"
 oFSO.CreateTextFile(strArchName)
 End If
 
-' функция опеределения MAC адреса сетевой карты, в функцию должно передаваться имя ПК
+' С„СѓРЅРєС†РёСЏ РѕРїРµСЂРµРґРµР»РµРЅРёСЏ MAC Р°РґСЂРµСЃР° СЃРµС‚РµРІРѕР№ РєР°СЂС‚С‹, РІ С„СѓРЅРєС†РёСЋ РґРѕР»Р¶РЅРѕ РїРµСЂРµРґР°РІР°С‚СЊСЃСЏ РёРјСЏ РџРљ
 Function macfunc(strComputer)
 Set objWMIService = GetObject("winmgmts:" & "{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
 Set IPConfigSet = objWMIService.ExecQuery _
  ("Select * from Win32_NetworkAdapterConfiguration Where IPEnabled=TRUE")
 For Each IPConfig In IPConfigSet
-'MAC адрес
+'MAC Р°РґСЂРµСЃ
    strMACAddress = IPConfig.MACAddress(i)
-   macfunc=strMACAddress & " IP:" & IPConfig.IPAddress(i)'Возвращенное значение
+   macfunc=strMACAddress & " IP:" & IPConfig.IPAddress(i)'Р’РѕР·РІСЂР°С‰РµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
   
 Next
 End Function 
@@ -74,34 +74,35 @@ Function ConvertToKey(regKey)
 End Function
 
 
-'Объявляем функцию записи в файл МАК адреса
+'РћР±СЉСЏРІР»СЏРµРј С„СѓРЅРєС†РёСЋ Р·Р°РїРёСЃРё РІ С„Р°Р№Р» РњРђРљ Р°РґСЂРµСЃР°
 Function MACWrite()
   Dim fso, f
   Set fso = CreateObject("Scripting.FileSystemObject")
-  Set f = fso.OpenTextFile(strArchName,8) '1-чтение 2-для записи 8 - дозапись
-  ' Записать строку с переводом на новую строку.
-  f.WriteLine((strComputer)) '& ": "&+macfunc(strComputer)) 'Пишем имя ПК и MAC
-  f.WriteLine("MAC: "&+macfunc(strComputer)) 'Пишем имя ПК и MAC
+  Set f = fso.OpenTextFile(strArchName,8) '1-С‡С‚РµРЅРёРµ 2-РґР»СЏ Р·Р°РїРёСЃРё 8 - РґРѕР·Р°РїРёСЃСЊ
+  ' Р—Р°РїРёСЃР°С‚СЊ СЃС‚СЂРѕРєСѓ СЃ РїРµСЂРµРІРѕРґРѕРј РЅР° РЅРѕРІСѓСЋ СЃС‚СЂРѕРєСѓ.
+  f.WriteLine((strComputer)) '& ": "&+macfunc(strComputer)) 'РџРёС€РµРј РёРјСЏ РџРљ Рё MAC
+  f.WriteLine("MAC: "&+macfunc(strComputer)) 'РџРёС€РµРј РёРјСЏ РџРљ Рё MAC
   f.Close
 End Function
 
-' Процедура которая открывает файл и ищет в нем строку с именем ПК и MAC адресом, если MAC Машины и имя ПК совпадает со значением из файла, то выходим из скрипта
-' Если такого МАК адреса нет, то пишем в файл MAC данной машины
+' РџСЂРѕС†РµРґСѓСЂР° РєРѕС‚РѕСЂР°СЏ РѕС‚РєСЂС‹РІР°РµС‚ С„Р°Р№Р» Рё РёС‰РµС‚ РІ РЅРµРј СЃС‚СЂРѕРєСѓ СЃ РёРјРµРЅРµРј РџРљ Рё MAC Р°РґСЂРµСЃРѕРј, 
+' РµСЃР»Рё MAC РњР°С€РёРЅС‹ Рё РёРјСЏ РџРљ СЃРѕРІРїР°РґР°РµС‚ СЃРѕ Р·РЅР°С‡РµРЅРёРµРј РёР· С„Р°Р№Р»Р°, С‚Рѕ РІС‹С…РѕРґРёРј РёР· СЃРєСЂРёРїС‚Р°
+' Р•СЃР»Рё С‚Р°РєРѕРіРѕ РњРђРљ Р°РґСЂРµСЃР° РЅРµС‚, С‚Рѕ РїРёС€РµРј РІ С„Р°Р№Р» MAC РґР°РЅРЅРѕР№ РјР°С€РёРЅС‹
 Sub OpenFileScan()
   Dim fso, f, readmac
   Set fso = CreateObject("Scripting.FileSystemObject")
-  Set f = fso.OpenTextFile(strArchName,1) '1-чтение 2-для записи 8 - дозапись
-If fso.FileExists(strArchName) Then 'Файл со списком ПК
-set readfile = fso.OpenTextFile(strArchName,1) 'Чтаем файл
-While Not readfile.AtEndOfStream 'Читаем построчно, пока не конец файла
+  Set f = fso.OpenTextFile(strArchName,1) '1-С‡С‚РµРЅРёРµ 2-РґР»СЏ Р·Р°РїРёСЃРё 8 - РґРѕР·Р°РїРёСЃСЊ
+If fso.FileExists(strArchName) Then 'Р¤Р°Р№Р» СЃРѕ СЃРїРёСЃРєРѕРј РџРљ
+set readfile = fso.OpenTextFile(strArchName,1) 'Р§С‚Р°РµРј С„Р°Р№Р»
+While Not readfile.AtEndOfStream 'Р§РёС‚Р°РµРј РїРѕСЃС‚СЂРѕС‡РЅРѕ, РїРѕРєР° РЅРµ РєРѕРЅРµС† С„Р°Р№Р»Р°
     readmac=readfile.ReadLine
  s="MAC: "&+macfunc(strComputer)
-  If s=readmac Then ' Если имя ПК и соответствующий ему мак адрес в файле есть то выходим из скрипта
- MsgBox "Этот компютер уже учавствовал в опросе"
- WScript.Quit 'выход
+  If s=readmac Then ' Р•СЃР»Рё РёРјСЏ РџРљ Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ РµРјСѓ РјР°Рє Р°РґСЂРµСЃ РІ С„Р°Р№Р»Рµ РµСЃС‚СЊ С‚Рѕ РІС‹С…РѕРґРёРј РёР· СЃРєСЂРёРїС‚Р°
+ MsgBox "Р­С‚РѕС‚ РєРѕРјРїСЋС‚РµСЂ СѓР¶Рµ СѓС‡Р°РІСЃС‚РІРѕРІР°Р» РІ РѕРїСЂРѕСЃРµ"
+ WScript.Quit 'РІС‹С…РѕРґ
  End If
 Wend
-MACWrite() ' Вызываем функцию записи в файл Имя ПК и его MAC адреса
+MACWrite() ' Р’С‹Р·С‹РІР°РµРј С„СѓРЅРєС†РёСЋ Р·Р°РїРёСЃРё РІ С„Р°Р№Р» РРјСЏ РџРљ Рё РµРіРѕ MAC Р°РґСЂРµСЃР°
 End If
 End Sub
 
